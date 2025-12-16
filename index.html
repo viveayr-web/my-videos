@@ -14,8 +14,38 @@
 
     h1 {
       text-align: center;
+      margin-bottom: 10px;
     }
 
+    /* Top input bar */
+    .top-bar {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .top-bar input {
+      padding: 10px;
+      width: 260px;
+      max-width: 90%;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .top-bar button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .top-bar button:hover {
+      background: #0056b3;
+    }
+
+    /* Video grid */
     .video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -35,12 +65,20 @@
       width: 100%;
       height: 200px;
       border-radius: 6px;
+      border: none;
     }
 
     .title {
-      margin-top: 10px;
+      margin-top: 8px;
       font-weight: bold;
       text-align: center;
+      font-size: 14px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #666;
+      margin-top: 50px;
     }
   </style>
 </head>
@@ -48,62 +86,80 @@
 
 <h1>📺 My Video Collection</h1>
 
-<div class="video-grid">
-
-  <div class="video-card">
-    <iframe width="480" height="345" src="https://thisvid.com/embed/13495845/" frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
-    <div class="title">Video Title 1</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/13450320"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 2</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/11043391"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 3</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/11043391"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 3</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/11043391"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 3</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/11043391"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 3</div>
-  </div>
-
-  <div class="video-card">
-    <iframe 
-      src="https://thisvid.com/embed/11043391"
-      allowfullscreen>
-    </iframe>
-    <div class="title">Video Title 3</div>
-  </div>
-
+<!-- 🔼 Add Video Section -->
+<div class="top-bar">
+  <input id="videoUrl" placeholder="Paste embed URL (https://c.com/embed/...)" />
+  <input id="videoTitle" placeholder="Video title (optional)" />
+  <br>
+  <button onclick="addVideo()">➕ Add Video</button>
 </div>
+
+<!-- 🎬 Video Grid -->
+<div class="video-grid" id="videoGrid"></div>
+
+<div class="empty" id="emptyMsg" style="display:none;">
+  No videos yet. Add one above ☝️
+</div>
+
+<script>
+  // 🔗 PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+  const API_URL = "YOUR_WEB_APP_URL_HERE";
+
+  async function addVideo() {
+    const url = document.getElementById("videoUrl").value.trim();
+    const title = document.getElementById("videoTitle").value.trim();
+
+    if (!url) {
+      alert("Please paste a video embed URL");
+      return;
+    }
+
+    await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        url: url,
+        title: title || "Untitled Video"
+      })
+    });
+
+    document.getElementById("videoUrl").value = "";
+    document.getElementById("videoTitle").value = "";
+
+    loadVideos();
+  }
+
+  async function loadVideos() {
+    const grid = document.getElementById("videoGrid");
+    const emptyMsg = document.getElementById("emptyMsg");
+
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    grid.innerHTML = "";
+
+    if (data.length === 0) {
+      emptyMsg.style.display = "block";
+      return;
+    }
+
+    emptyMsg.style.display = "none";
+
+    data.reverse().forEach(row => {
+      const [url, title] = row;
+
+      const card = document.createElement("div");
+      card.className = "video-card";
+      card.innerHTML = `
+        <iframe src="${url}" allowfullscreen></iframe>
+        <div class="title">${title}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // Load videos on page load
+  loadVideos();
+</script>
 
 </body>
 </html>
