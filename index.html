@@ -1,239 +1,244 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>My Video Library</title>
 
 <style>
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
   background: #0f0f0f;
   color: #fff;
-}
-
-/* LAYOUT */
-.container {
-  display: flex;
-}
-
-/* SIDEBAR */
-.sidebar {
-  width: 220px;
-  background: #121212;
-  padding: 15px;
-  border-right: 1px solid #222;
-}
-
-.sidebar h3 {
-  margin-top: 0;
-  font-weight: 500;
-}
-
-.category {
-  padding: 8px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 6px;
-  background: #1c1c1c;
-}
-
-.category:hover {
-  background: #2a2a2a;
-}
-
-.category.active {
-  background: #3a3a3a;
-}
-
-/* MAIN */
-.main {
-  flex: 1;
+  margin: 0;
   padding: 20px;
 }
 
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 500;
+}
+
+/* TOP BAR */
+.top-bar {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
 .top-bar input {
-  padding: 8px;
+  padding: 10px;
+  width: 260px;
+  margin: 5px;
   background: #181818;
-  border: 1px solid #333;
-  color: white;
+  color: #fff;
+  border: 1px solid #303030;
   border-radius: 6px;
-  margin-right: 6px;
 }
 
 .top-bar button {
+  padding: 10px 14px;
   background: #272727;
   border: 1px solid #3a3a3a;
-  color: white;
-  padding: 8px 12px;
+  color: #fff;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 18px;
 }
 
+/* GRID */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
-  gap: 20px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  max-width: 1400px;
+  margin: auto;
 }
 
+/* CARD */
 .video-card {
   background: #181818;
   padding: 10px;
   border-radius: 14px;
-  transition: transform .2s ease;
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
 }
 
+.video-card:nth-child(4n+1):hover { background:#1f2937; }
+.video-card:nth-child(4n+2):hover { background:#1f2f25; }
+.video-card:nth-child(4n+3):hover { background:#2a1f2f; }
+.video-card:nth-child(4n+4):hover { background:#2f241f; }
+
 .video-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.75);
 }
 
 iframe {
   width: 100%;
-  height: 180px;
+  height: 200px;
   border-radius: 12px;
   border: none;
 }
 
+/* TITLE */
 .title {
   text-align: center;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 14px;
+  color: #e5e5e5;
+  cursor: pointer;
 }
 
+/* TITLE EDIT */
+.title-edit {
+  width: 100%;
+  padding: 6px;
+  background: #101010;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* ACTIONS */
 .actions {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 6px;
+  margin-top: 10px;
+}
+
+.actions a,
+.delete-btn {
+  width: 36px;
+  height: 36px;
+  background: #2a2a2a;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #7a1f1f;
 }
 
 .actions img {
   width: 22px;
-  cursor: pointer;
+  height: 22px;
 }
 
-.delete-btn {
-  cursor: pointer;
+.delete-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<h1>My Video Collection</h1>
 
-  <!-- 📂 SIDEBAR -->
-  <div class="sidebar">
-    <h3>Categories</h3>
-    <div id="categories"></div>
-    <button onclick="addCategory()">➕ Add</button>
-  </div>
-
-  <!-- 🎬 MAIN -->
-  <div class="main">
-    <h2 id="currentCategory">Home</h2>
-
-    <div class="top-bar">
-      <input id="videoUrl" placeholder="Paste URL">
-      <input id="videoTitle" placeholder="Title">
-      <button onclick="addVideo()">➕</button>
-    </div>
-
-    <div class="video-grid" id="videoGrid"></div>
-  </div>
-
+<div class="top-bar">
+  <input id="videoUrl" placeholder="Paste URL">
+  <input id="videoTitle" placeholder="Video title">
+  <br>
+  <button onclick="addVideo()">➕</button>
 </div>
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbx0hoCsO6o-Np3DCn5YnbJSXcaHl4kBthNXYa-Q5mxV7vQfy0MCgKQ_4oUD-SooLKns/exec";
-const DELETE_PASSWORD = "00000";
+<div class="video-grid" id="videoGrid"></div>
 
-let currentCategory = "Home";
-let categories = new Set(["Home"]);
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz-cHGjRLft84eo2SlgZK_Ec8AsRCZn20DHwFR7Cu7MVLD5dJ8W5KQUYVXBIHoGLB9K/exec";
+const DELETE_PASSWORD = "00000";
 
 function getDomain(url) {
   try { return new URL(url).hostname; }
   catch { return "google.com"; }
 }
 
-async function loadVideos() {
-  const res = await fetch(API_URL + "?category=" + currentCategory);
-  const data = await res.json();
-  videoGrid.innerHTML = "";
-
-  data.forEach(([url,title]) => {
-    videoGrid.innerHTML += `
-      <div class="video-card">
-        <iframe src="${url}" allowfullscreen></iframe>
-        <div class="title">${title}</div>
-        <div class="actions">
-          <a href="${url}" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=${getDomain(url)}&sz=64">
-          </a>
-          <span class="delete-btn" onclick="deleteVideo('${url}')">🗑️</span>
-        </div>
-      </div>
-    `;
-  });
-}
-
-async function loadCategories() {
-  const res = await fetch(API_URL + "?category=ALL");
-  const data = await res.json();
-  data.forEach(r => categories.add(r[2] || "Home"));
-
-  const container = document.getElementById("categories");
-  container.innerHTML = "";
-
-  categories.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "category" + (c === currentCategory ? " active" : "");
-    div.innerText = c;
-    div.onclick = () => {
-      currentCategory = c;
-      document.getElementById("currentCategory").innerText = c;
-      loadCategories();
-      loadVideos();
-    };
-    container.appendChild(div);
-  });
-}
-
-function addCategory() {
-  const name = prompt("Category name:");
-  if (!name) return;
-  categories.add(name);
-  loadCategories();
-}
-
 async function addVideo() {
-  if (!videoUrl.value) return alert("Paste URL");
-
+  if (!videoUrl.value.trim()) return alert("Paste a URL");
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({
-      url: videoUrl.value,
-      title: videoTitle.value,
-      category: currentCategory
-    })
+    body: JSON.stringify({ url: videoUrl.value, title: videoTitle.value })
   });
-
   videoUrl.value = "";
   videoTitle.value = "";
   loadVideos();
 }
 
-async function deleteVideo(url) {
-  if (prompt("Password") !== DELETE_PASSWORD) return;
+async function renameTitle(url, newTitle) {
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ action:"delete", url })
+    body: JSON.stringify({
+      action: "rename",
+      url: url,
+      title: newTitle
+    })
+  });
+}
+
+async function deleteVideo(url) {
+  if (prompt("Delete password:") !== DELETE_PASSWORD) return;
+  if (!confirm("Delete this video?")) return;
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "delete", url })
   });
   loadVideos();
 }
 
-loadCategories();
+async function loadVideos() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  videoGrid.innerHTML = "";
+
+  data.reverse().forEach(([url, title]) => {
+    const card = document.createElement("div");
+    card.className = "video-card";
+
+    card.innerHTML = `
+      <iframe src="${url}" allowfullscreen></iframe>
+      <div class="title" ondblclick="startEdit(this,'${url}')">${title || "Untitled"}</div>
+      <div class="actions">
+        <a href="${url}" target="_blank">
+          <img src="https://www.google.com/s2/favicons?domain=${getDomain(url)}&sz=64">
+        </a>
+        <button class="delete-btn" onclick="deleteVideo('${url}')">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 6h18v2H3zm2 3h14l-1 12H6L5 9zm5-5h4l1 2H9l1-2z"/>
+          </svg>
+        </button>
+      </div>
+    `;
+    videoGrid.appendChild(card);
+  });
+}
+
+/* ✏️ TRIPLE CLICK (dblclick workaround) */
+function startEdit(el, url) {
+  const input = document.createElement("input");
+  input.value = el.innerText;
+  input.className = "title-edit";
+  el.replaceWith(input);
+  input.focus();
+
+  input.onkeydown = e => {
+    if (e.key === "Enter") finishEdit(input, url);
+    if (e.key === "Escape") loadVideos();
+  };
+
+  input.onblur = () => finishEdit(input, url);
+}
+
+async function finishEdit(input, url) {
+  if (!input.value.trim()) return loadVideos();
+  await renameTitle(url, input.value.trim());
+  loadVideos();
+}
+
 loadVideos();
 </script>
 
