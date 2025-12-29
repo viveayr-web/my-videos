@@ -225,31 +225,55 @@ function getDomain(url) {
 
 async function addVideo() {
   if (!videoUrl.value.trim()) return alert("Paste a URL");
+
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ url: videoUrl.value, title: videoTitle.value })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      url: videoUrl.value,
+      title: videoTitle.value,
+      category: CATEGORY
+    })
   });
+
   videoUrl.value = "";
   videoTitle.value = "";
   loadVideos();
 }
 
+
 async function renameTitle(url, newTitle) {
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ action: "rename", url, title: newTitle })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "rename",
+      url,
+      title: newTitle,
+      category: CATEGORY
+    })
   });
 }
 
+
 async function deleteVideo(url) {
   if (prompt("Delete password:") !== DELETE_PASSWORD) return;
-  if (!confirm("Delete this video?")) return;
+
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ action: "delete", url })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "delete",
+      url,
+      category: CATEGORY
+    })
   });
+
   loadVideos();
 }
+
 
 async function loadVideos() {
   const res = await fetch(API_URL);
