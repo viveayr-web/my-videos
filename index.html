@@ -199,7 +199,7 @@ iframe {
 <div class="video-grid" id="videoGrid"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzl0U7df6UCrWJ106lvCBb23uXakMipmGxH46S9IIwfcDOtfhg99O8oAE5BbX1y3wHB1Q/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwyxTgrvX3szgrN98ciD3uLG1VRI1_mXigbV-uGYrtRtqOUuXar1BDusu6QrxA-fJSO/exec";
 const DELETE_PASSWORD = "00000";
 const PAGE_PASSWORD = "12345"; // 🔑 CHANGE THIS
 
@@ -225,55 +225,31 @@ function getDomain(url) {
 
 async function addVideo() {
   if (!videoUrl.value.trim()) return alert("Paste a URL");
-
   await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      url: videoUrl.value,
-      title: videoTitle.value,
-      category: CATEGORY
-    })
+    body: JSON.stringify({ url: videoUrl.value, title: videoTitle.value })
   });
-
   videoUrl.value = "";
   videoTitle.value = "";
   loadVideos();
 }
 
-
 async function renameTitle(url, newTitle) {
   await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "rename",
-      url,
-      title: newTitle,
-      category: CATEGORY
-    })
+    body: JSON.stringify({ action: "rename", url, title: newTitle })
   });
 }
-
 
 async function deleteVideo(url) {
   if (prompt("Delete password:") !== DELETE_PASSWORD) return;
-
+  if (!confirm("Delete this video?")) return;
   await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "delete",
-      url,
-      category: CATEGORY
-    })
+    body: JSON.stringify({ action: "delete", url })
   });
-
   loadVideos();
 }
-
 
 async function loadVideos() {
   const res = await fetch(API_URL);
